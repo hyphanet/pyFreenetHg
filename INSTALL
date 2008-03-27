@@ -15,7 +15,7 @@ download FreenetHg.py and put it somethere.
 add the following to your ~/.hgrc:
 
 [extensions]
-hgk=/path/to/FreenetHg.py
+freenethg=/path/to/FreenetHg.py
 
 [freenethg]
 config=/path/to/config.file
