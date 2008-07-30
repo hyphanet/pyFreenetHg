@@ -17,22 +17,21 @@ add the following to your ~/.hgrc:
 [extensions]
 freenethg=/path/to/FreenetHg.py
 
-[freenethg]
-config=/path/to/config.file
-
----
-
-the config file must exist, but can be emty (0 Bytes)
-if its read only, you need to add the keys for the updater by yourself:
-
-[/path/to/repo]
-inserturi=USK@bar
-requesturi=USK@foo
-
----
-
 now run "hg help", it should show you new fcp-* commands.
 
 type "hg help commandname" for further details
 
 more about plugin install: http://www.selenic.com/mercurial/wiki/index.cgi/UsingExtensions
+
+
+Hook configuration:
+
+add the following to your <projectdir>/.hg/hgrc:
+
+[hooks]
+precommit = python:freenethg.updatestatic_hook
+
+[freenethg]
+inserturi = USK@insertiru/1/name
+
+

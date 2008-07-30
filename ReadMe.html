@@ -34,36 +34,26 @@ last not least: a running freenet node ;)
 <p>hg clone|pull static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&nbsp;/tmp/your/local/path</p>
 <h3>install</h3>
 <p><a href="INSTALL" target="_blank">read install instructions</a></p>
-
 <p>download <a href="FreenetHg.py" target="_blank">FreenetHg.py</a> and put it somewhere.<br>
 add the following to your ~/.hgrc:
 </p>
 <pre>
 [extensions]
 freenethg=/path/to/FreenetHg.py
-
-[freenethg]
-config=/path/to/config.file
-</pre>
-<h3>config</h3>
-<p>the configfile is needed if you want to make your repository accessible via static-http</p>
-<p>the config file have the following syntax:</p>
-<pre>
-[/path/to/repos]
-InsertURI=USK@foo/projectname/1
-RequestURI=USK@bar/projectname/1
 </pre>
 
-<p>adding hook for auto update (hgrc):</p>
+<p>adding hook for auto update (./hg/hgrc):</p>
 <pre>
 [hooks]
-incoming = python:FreenetHq.updatestatic_hook
-commit = python:FreenetHq.updatestatic_hook
+commit = python:freenethg.updatestatic_hook
+
+[freenethg]
+inserturi = USK@foo,bar/1/Name
 </pre>
-<h3>eclipse</h3>
+<!-- h3>eclipse</h3>
 <p>modified MercurialEclipse plugin (vectrace, 0.1.102) to fire fcp-createstatic and fcp-updatestatic from within eclipse</p>
 <p>use this key as eclipse update site or open it in your browser and download &amp; install it manually.</p>
-<p><a href="USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/FreenetUpdateSite/1/" target="_blank">http://127.0.0.1:8888/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/EclipseUpdateSite/1/</a></p>
+<p><a href="USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/FreenetUpdateSite/1/" target="_blank">http://127.0.0.1:8888/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/EclipseUpdateSite/1/</a></p -->
 </div>
 </body>
 </html>
