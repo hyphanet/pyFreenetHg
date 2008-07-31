@@ -67,9 +67,11 @@ class _static_composer:
         
         for s in a:
             if s == 'hgrc':
-                pass # it may contains private/local config!!
+                pass # it may contains private/local config!! -> forbitten
             elif s == 'store':
                 pass # store parsed later explizit
+            elif s == 'wlock':
+                pass # called from hook, ignore
             else:
                 self._addItem('', s)
                 
@@ -81,6 +83,8 @@ class _static_composer:
         for s in a:
             if s[-1:] == '/':
                 self._parseDir(dir + '/' + s[:-1])
+            elif s[-4:] == 'lock':
+            	pass # called from hook, ignore
             else:
                 self._addItem(dir, s)
             
@@ -203,36 +207,50 @@ def fcp_createstatic(ui, repo, uri=None, **opts):
     """put the repo into freenet for access via static-http, updatedable (not implemented jet)   
     """
  
-    #conf = repo.url()[5:] + '/.hg/fhc.rc'
-    #self.ui = ui
-    
-    #if os.path.exists(conf):
-    #    print "Error: allready created"
-    #    return
-    
-    #print conf
-    #uri = repo.config('freenethg', 'uri')
-    #if uri:
-    #    print "ttttt " + uri
-        
-    #        self.ui.readsections(cfg, 'usersubs', 'reposubs')
-    #    self.repo = repo
-    #    self.stripcount = int(self.ui.config('notify', 'strip', 0))
-    #    self.root = self.strip(self.repo.root)
-    #    self.domain = self.ui.config('notify', 'domain')
-    #    self.subs = self.subscribers()
-
-
+    pass
+ 
 def fcp_updatestatic(ui, repo, **opts):
-    """update the repo in freenet for access via static-http   
+    """update the repo in freenet for access via static-http (not implemented jet)  
     """
     
-    print ui
-    print repo.url()
+    pass
     
 def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     """update static (not implemented jet)"""
-
+    
+    
+    id = "freenethgid" + str(int(time.time() * 1000000))
+    host = ui.config('freenethg', 'fcphost')
+    port = ui.config('freenethg', 'fcpport')
+     
+    uri = ui.config('freenethg', 'inserturi')
+    #uri = "CHK@"
+   
+    fcpopts = {}
+    fcpopts['verbosity'] = fcp.INFO
+    fcpopts['host'] = host
+    fcpopts['port'] = port
+    
+    node = myFCP(**fcpopts)
+         
+    cmd = "ClientPutComplexDir\n" + "URI=" + uri + "\nIdentifier=" + id
+    cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\n"
+    
+    composer = _static_composer(repo)   
+    
+    print "Debug: " + cmd + composer.getCmd()
+    
+    print "site composer done." 
+    print "insert now. this may take a while..."
+    
+    #testresult = 'debug'
+    #testresult = node.putraw(id, cmd + composer.getRawCmd())
+    testresult = node.putraw2(id, cmd + composer.getRawCmd())
+    
+    node.shutdown();
+    
+    print "success? " + testresult
+   
          
 remoteopts = [
     ('e', 'ssh', '', 'specify ssh command to use'),
