@@ -32,6 +32,7 @@ add the following to your <projectdir>/.hg/hgrc:
 precommit = python:freenethg.updatestatic_hook
 
 [freenethg]
-inserturi = USK@insertiru/1/name
-
+inserturi = USK@inserturi/Name/1
+fcphost = 127.0.0.1
+fcpport = 9481
 

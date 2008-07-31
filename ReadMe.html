@@ -48,7 +48,10 @@ freenethg=/path/to/FreenetHg.py
 commit = python:freenethg.updatestatic_hook
 
 [freenethg]
-inserturi = USK@foo,bar/1/Name
+inserturi = USK@foo,bar/Name/1
+fcphost = 127.0.0.1
+fcpport = 9481
+
 </pre>
 <!-- h3>eclipse</h3>
 <p>modified MercurialEclipse plugin (vectrace, 0.1.102) to fire fcp-createstatic and fcp-updatestatic from within eclipse</p>
