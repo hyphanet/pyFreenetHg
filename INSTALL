@@ -29,7 +29,7 @@ Hook configuration:
 add the following to your <projectdir>/.hg/hgrc:
 
 [hooks]
-precommit = python:freenethg.updatestatic_hook
+commit = python:freenethg.updatestatic_hook
 
 [freenethg]
 inserturi = USK@inserturi/Name/1
