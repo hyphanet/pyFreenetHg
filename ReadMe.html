@@ -6,7 +6,9 @@
 </head>
 <body>
 <div align="center">
+<p>&nbsp;</p>
 <h1>Freenet &amp; mercurial</h1>
+<p><a href="/?newbookmark=USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/1/&amp;desc=Freenet and Mercurial" target="_blank">add to bookmarks: Freenet and Mercurial</a></p>
 <p>&nbsp;</p>
 <h3>licence</h3>
 <p>this document and pyFreenetHg is published under the strong WTFPL</p>
@@ -18,16 +20,22 @@ working with freenet.<br>
 <pre>
 the basic idea: wrap around (selected) commands and use freenet as transport instead files
      hg fcp-bundle   -> wraps around hg bundle and put a chk/usk instead a local file
-     hg fcp-unbundle -> wraps around hg unbundle and get it from a chk/usk instead a local file	
-     hg fcp-makestatic -> create a site thats accessible via static-http://127.0.0.1:8888/freenetkey
-     hg fcp-updatestatic -> update a site, see install/config
+     hg fcp-unbundle (not yet) -> wraps around hg unbundle and get it from a chk/usk instead a local file	
+     hg fcp-makestatic (not yet) -> create a site thats accessible via static-http://127.0.0.1:8888/freenetkey
+     hg fcp-updatestatic (not yet) -> update a site, see install/config
+     
+hooks:
+     updatestatic_hook -> does a full upload on each commit
+     updatestatic_hook2 (in progress) -> upload is only triggered on keyword in commit message
+                                      -> SiteToolPlugin is used to reduce upload size on large trees (if plugin is installed)     
 </pre>
 <h3>requirements</h3>
 <p>
 python &gt;= 2.3<br>
 mercurial &gt;= 0.9.x (for accessing pyFreenetHg's repository you need 0.9.3 or later)<br>
 pyFCP<br>
-last not least: a running freenet node ;)
+last not least: a running freenet node ;)<br />
+optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/0/" target="_blank">SiteToolPlugin</a>
 </p>
 <h3>getting</h3>
 <p><a href="FreenetHg.py" target="_blank">download from here</a></p>
@@ -51,8 +59,20 @@ commit = python:freenethg.updatestatic_hook
 inserturi = USK@foo,bar/Name/1
 fcphost = 127.0.0.1
 fcpport = 9481
-
 </pre>
+or
+<pre>
+[hooks]
+commit = python:freenethg.updatestatic2_hook
+
+[freenethg]
+inserturi = USK@foo,bar/Name/1
+requesturi = USK@oof,rab/Name/1
+fcphost = 127.0.0.1
+fcpport = 9481
+uploadkeyword = triggerword
+</pre>
+USK@foo,bar/Name/1
 <!-- h3>eclipse</h3>
 <p>modified MercurialEclipse plugin (vectrace, 0.1.102) to fire fcp-createstatic and fcp-updatestatic from within eclipse</p>
 <p>use this key as eclipse update site or open it in your browser and download &amp; install it manually.</p>
