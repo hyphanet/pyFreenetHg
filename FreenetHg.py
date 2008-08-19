@@ -216,7 +216,7 @@ def fcp_updatestatic(ui, repo, **opts):
     pass
     
 def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
-    """update static (not implemented jet)"""
+    """update static """
     
     
     id = "freenethgid" + str(int(time.time() * 1000000))
@@ -250,6 +250,37 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     node.shutdown();
     
     print "success? " + testresult
+    
+def updatestatic_hook2(ui, repo, hooktype, node=None, source=None, **kwargs):
+    """update static """
+    
+    kw = ui.config('freenethg', 'uploadkeyword')
+    
+    # if kw not set throw an error
+    
+    # message = getCommitMessage
+    # if messege not contains kw
+    #     nothing to do, return
+    
+    # stp = checkNodeForSiteToolPlugin
+    # if !stp     
+    #    # SiteToolPlugin not installed, print a warning and fallback to simple plain isert
+    #    updatestatic_hook(ui, repo, hooktype, node, source, kwargs)
+    
+    # We expect lost inserts, so don't belive in the parent passed into hook
+    # oldTip = getLatestFromFreenet
+    
+    # filelist = getChangedFiles(oldTip, newTip)
+    
+    # openSession (SiteToolPlugin)
+    
+    # applyFiles(fileList)
+    
+    # commitSession
+    
+    # ende
+    
+ 
    
          
 remoteopts = [
