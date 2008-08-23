@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
 # and/or modify it under the terms of the Do What The Fuck You Want
@@ -15,6 +15,8 @@ import fcp
  
 from mercurial import hg
 from mercurial import commands
+from mercurial import repo,cmdutil,util,ui,revlog,node
+from mercurial.node import bin
 
 class myFCP(fcp.FCPNode):
     
@@ -254,9 +256,38 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
 def updatestatic_hook2(ui, repo, hooktype, node=None, source=None, **kwargs):
     """update static """
     
-    kw = ui.config('freenethg', 'uploadkeyword')
+    # if ukw not set or empty throw an error
     
-    # if kw not set throw an error
+    ukw = ui.config('freenethg', 'uploadkeyword')
+    
+    if not ukw: 
+        raise Exception, 'required config option »uploadkeyword« not set'
+    
+    if len(ukw.strip()) == 0:
+        raise Exception, 'the keyword must contains at least one printable non-whitespace char'
+    
+    comment = repo.changelog.read(bin(node))[4]
+    
+    if ukw in comment:
+        updatestatic_hook(ui, repo, hooktype, node, kwargs)
+
+def updatestatic_hook3(ui, repo, hooktype, node=None, source=None, **kwargs):
+    """update static """
+    
+    # if ukw not set or empty throw an error
+    
+    ukw = ui.config('freenethg', 'uploadkeyword')
+    
+    if not ukw: 
+        raise ConfigError, 'required config option »uploadkeyword« not set'
+
+    # the keyword must contains at least one printable non-whitespace char
+    # test_ukw = ukw.trim()
+    
+    #if test_ukw == "":
+    #    raise ConfigError, 'required config option »uploadkeyword« cant be empty'
+    
+    # if kw not set or empty throw an error
     
     # message = getCommitMessage
     # if messege not contains kw
