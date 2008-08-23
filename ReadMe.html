@@ -26,8 +26,10 @@ the basic idea: wrap around (selected) commands and use freenet as transport ins
      
 hooks:
      updatestatic_hook -> does a full upload on each commit
-     updatestatic_hook2 (in progress) -> upload is only triggered on keyword in commit message
+     updatestatic_hook2 -> upload is only triggered on keyword in commit message
+     updatestatic_hook3 (in progress) -> upload is only triggered on keyword in commit message
                                       -> SiteToolPlugin is used to reduce upload size on large trees (if plugin is installed)     
+
 </pre>
 <h3>requirements</h3>
 <p>
@@ -64,6 +66,17 @@ or
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic2_hook
+
+[freenethg]
+inserturi = USK@foo,bar/Name/1
+fcphost = 127.0.0.1
+fcpport = 9481
+uploadkeyword = triggerword
+</pre>
+or
+<pre>
+[hooks]
+commit = python:freenethg.updatestatic3_hook
 
 [freenethg]
 inserturi = USK@foo,bar/Name/1
