@@ -212,11 +212,11 @@ def fcp_createstatic(ui, repo, uri=None, **opts):
     pass
  
 def fcp_updatestatic(ui, repo, **opts):
-    """update the repo in freenet for access via static-http (not implemented jet)  
+    """update the repo in freenet for access via static-http   
     """
     
-    pass
-    
+    updatestatic_hook(ui, repo, None, **opts)
+        
 def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     """update static """
     
