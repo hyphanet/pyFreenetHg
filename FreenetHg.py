@@ -171,10 +171,10 @@ def _make_node(**opts):
     fcpopts['verbosity'] = fcp.INFO
     host = opts.get('fcphost', None)
     if host:
-        fcpopts.put('host', host)
+        fcpopts['host'] = host
     port = opts.get('fcpport', None)
     if port:
-        fcpopts.put('port', port)
+        fcpopts['port'] = port
     #return node2.FCPNode(**fcpopts)
     return myFCP(**fcpopts)
     
@@ -183,9 +183,19 @@ def fcp_makestatic(ui, repo, uri=None, **opts):
     """
     
     id = "freenethgid" + str(int(time.time() * 1000000))
+
+    config_uri = ui.config('freenethg', 'inserturi')
+
     if uri == None:
-        uri="CHK@"
-         
+        if config_uri:
+            uri = config_uri
+        else:
+            uri="CHK@"
+
+    if not opts.get('fcphost'):
+        opts['fcphost'] = ui.config('freenethg', 'fcphost')
+    if not opts.get('fcpport'):
+        opts['fcpport'] = ui.config('freenethg', 'fcpport')
     cmd = "ClientPutComplexDir\n" + "URI=" + uri + "\nIdentifier=" + id
     cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\n"
     
@@ -232,6 +242,7 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     fcpopts['verbosity'] = fcp.INFO
     fcpopts['host'] = host
     fcpopts['port'] = port
+    #fcpopts['logfunc'] = ui.log
     
     node = myFCP(**fcpopts)
          
