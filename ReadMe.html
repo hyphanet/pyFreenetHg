@@ -51,7 +51,13 @@ add the following to your <i>~/.hgrc</i>:
 freenethg=/path/to/FreenetHg.py
 </pre>
 <h3>per repository configuration</h3>
+<p>To prevent identity leaks you should add an username to each <i>./hg/hgrc</i>:
+<pre>
+[ui]
+username = &lt;thenametouse&gt;
+</pre>
 <p>adding hook for auto update (<i>./hg/hgrc</i>):</p>
+</p>
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic_hook
