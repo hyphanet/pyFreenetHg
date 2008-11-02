@@ -42,16 +42,16 @@ optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8
 <h3>getting</h3>
 <p><a href="FreenetHg.py" target="_blank">download from here</a></p>
 <p>hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&nbsp;/tmp/your/local/path</p>
-<h3>install</h3>
+<h3>install pyFreenetHg</h3>
 <p>download <a href="FreenetHg.py" target="_blank">FreenetHg.py</a> and put it somewhere.<br>
-add the following to your ~/.hgrc:
+add the following to your <i>~/.hgrc</i>:
 </p>
 <pre>
 [extensions]
 freenethg=/path/to/FreenetHg.py
 </pre>
-
-<p>adding hook for auto update (./hg/hgrc):</p>
+<h3>per repository configuration</h3>
+<p>adding hook for auto update (<i>./hg/hgrc</i>):</p>
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic_hook
