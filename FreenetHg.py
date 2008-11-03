@@ -60,7 +60,7 @@ class _static_composer:
         """ """
 
         self._rootdir = repo.url()[5:] + '/.hg/'
-        self._index = 0;
+        self._index = 0
         self._fileitemlist = {}
         self._databuff = ''
         self._cmdbuff = ''
@@ -102,7 +102,7 @@ class _static_composer:
         content = f.read()
         f.close()
 
-        self._databuff = self._databuff + content;
+        self._databuff = self._databuff + content
         idx = str(self._index)
 
         self._cmdbuff = self._cmdbuff + "Files."+idx+".Name=.hg/" + virtname + '\n'
@@ -158,9 +158,9 @@ def fcp_bundle(ui, repo, **opts):
     #node = fcp.FCPNode(verbosity=fcp.DETAIL)
     node = _make_node(**opts)
 
-    insertresult = node.put(data=bundledata, priority=1, mimetype="mercurial/bundle");
+    insertresult = node.put(data=bundledata, priority=1, mimetype="mercurial/bundle")
 
-    node.shutdown();
+    node.shutdown()
 
     print "bundle inserted: " + insertresult
 
@@ -187,7 +187,7 @@ def fcp_unbundle(ui, repo, uri , **opts):
     except fcp.node.FCPException, e:
         print e
 
-    node.shutdown();
+    node.shutdown()
 
     if unbundle:
         changes = unbundle[1]
@@ -243,7 +243,7 @@ def fcp_makestatic(ui, repo, uri=None, **opts):
     #testresult = node.putraw(id, cmd + composer.getRawCmd())
     testresult = node.putraw2(id, cmd + composer.getRawCmd())
 
-    node.shutdown();
+    node.shutdown()
 
     print "success? " + testresult
 
@@ -292,7 +292,7 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     #testresult = node.putraw(id, cmd + composer.getRawCmd())
     testresult = node.putraw2(id, cmd + composer.getRawCmd())
 
-    node.shutdown();
+    node.shutdown()
 
     print "success? " + testresult
 
