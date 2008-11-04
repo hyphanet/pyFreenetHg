@@ -13,10 +13,41 @@ import sys
 import dircache
 import fcp
 
+from nntplib import NNTP
+from StringIO import StringIO
+from string import Template
+
 from mercurial import hg
 from mercurial import commands
 from mercurial import repo,cmdutil,util,ui,revlog,node
 from mercurial.node import bin
+
+class FMS_NNTP(NNTP):
+    """class for posts to newsgroups on nntp servers"""
+
+    nntp_msg_template = Template("""From: $fms_user\nNewsgroups: $fms_groups\nSubject: $subject\nContent-Type: text/plain; charset=UTF-8\n\n$body""")
+
+    def __init__(self, host, fms_user, groups, port=1119):
+        self.fms_user = fms_user
+        self.fms_groups = groups
+        NNTP.__init__(self, host, port=port)
+
+    def post_updatestatic(self,uri):
+
+        repository_name = uri.split('/')[1]
+
+        body = 'This is an automated message of pyFreenetHg.\n\nMercurial repository update:\n%s' % uri
+
+        template_data = {'body':body,
+                         'subject':'Update of repository "%s"' % repository_name,
+                         'fms_user':self.fms_user,
+                         'fms_groups':self.fms_groups,}
+
+        article = StringIO(self.nntp_msg_template.substitute(template_data))
+        result = self.post(article)
+        article.close()
+
+        return result
 
 class myFCP(fcp.FCPNode):
 
@@ -50,7 +81,7 @@ class myFCP(fcp.FCPNode):
         self.verbosity = fcp.DETAIL
         return ticket.wait()
 
-class _static_composer:
+class _static_composer(object):
     """
     a helper class to compose the ClientPutComplexDir
     """
@@ -240,12 +271,19 @@ def fcp_makestatic(ui, repo, uri=None, **opts):
 
     node = _make_node(**opts)
 
-    #testresult = node.putraw(id, cmd + composer.getRawCmd())
-    testresult = node.putraw2(id, cmd + composer.getRawCmd())
+    testresult = None
+
+    try:
+        #testresult = node.putraw(id, cmd + composer.getRawCmd())
+        testresult = node.putraw2(id, cmd + composer.getRawCmd())
+    except fcp.node.FCPException, e:
+        print e
 
     node.shutdown()
 
-    print "success? " + testresult
+    if testresult:
+        print "success: " + testresult
+        # here method for automated fms posts should be called
 
 def fcp_createstatic(ui, repo, uri=None, **opts):
     """put the repo into freenet for access via static-http, updatedable (not implemented jet)
@@ -288,13 +326,32 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     print "site composer done."
     print "insert now. this may take a while..."
 
-    #testresult = 'debug'
-    #testresult = node.putraw(id, cmd + composer.getRawCmd())
-    testresult = node.putraw2(id, cmd + composer.getRawCmd())
+    testresult = None
+
+    try:
+        #testresult = node.putraw(id, cmd + composer.getRawCmd())
+        testresult = node.putraw2(id, cmd + composer.getRawCmd())
+    except fcp.node.FCPException, e:
+        print e
 
     node.shutdown()
 
-    print "success? " + testresult
+    if testresult:
+        print "success: " + testresult
+
+        fms_host = ui.config('freenethg','fmshost')
+        fms_port = ui.config('freenethg','fmsport')
+        fms_user = ui.config('freenethg','fmsuser')
+        fms_groups = ui.config('freenethg','fmsgroups')
+
+        if fms_host and fms_port and fms_user and fms_groups:
+
+            server = FMS_NNTP(fms_host, fms_user, fms_groups, int(fms_port))
+            result = server.post_updatestatic(testresult)
+            server.quit()
+
+            print "NNTP result: %s" % str(result)
+
 
 def updatestatic_hook2(ui, repo, hooktype, node=None, source=None, **kwargs):
     """update static """
