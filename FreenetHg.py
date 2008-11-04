@@ -22,6 +22,19 @@ from mercurial import commands
 from mercurial import repo,cmdutil,util,ui,revlog,node
 from mercurial.node import bin
 
+class IndexPageMaker(object):
+    """class for generate an index page"""
+    
+    def getBuildInIndexPage(self):
+        return '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n \
+                <html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n \
+                <title>Sorry, Not a Freesite</title>\n</head>\n<body>\n \
+                Sorry, this is not a freesite, this is a mercurial repository.<br>\n \
+                Please use hg clone|pull http-static://127.0.0.1:8888/URI to use the repository.<br>\n \
+                <p>&nbsp;</p>\n \
+                created with <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/1/">pyFreenetHg</a>\n \
+                </body>\n</html>\n'    
+
 class FMS_NNTP(NNTP):
     """class for posts to newsgroups on nntp servers"""
 
@@ -95,6 +108,7 @@ class _static_composer(object):
         self._fileitemlist = {}
         self._databuff = ''
         self._cmdbuff = ''
+        self._indexname = None
 
         a = dircache.listdir(self._rootdir)
 
@@ -142,6 +156,17 @@ class _static_composer(object):
         self._cmdbuff = self._cmdbuff + "Files."+idx+".DataLength=" + str(len(content)) + '\n'
 
         self._index = self._index + 1
+        
+    def addIndex(self, indexpage):
+        idx = str(self._index)
+        self._cmdbuff = self._cmdbuff + "Files."+idx+".Name=index.html"+'\n'
+        self._cmdbuff = self._cmdbuff + "Files."+idx+".UploadFrom=direct" + '\n'
+        self._cmdbuff = self._cmdbuff + "Files."+idx+".Metadata.ContentType=text/html" + '\n'
+        self._cmdbuff = self._cmdbuff + "Files."+idx+".DataLength=" + str(len(indexpage)) + '\n'
+        self._index = self._index + 1
+        self._cmdbuff = self._cmdbuff + "DefaultName=index.html\n"
+        
+        self._databuff = self._databuff + indexpage
 
     def getCmd(self):
         return self._cmdbuff + "Data\n"
@@ -315,11 +340,16 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
 
     #fcpopts['logfunc'] = ui.log
     node = myFCP(**fcpopts)
+    
+    
+    indexpage = IndexPageMaker().getBuildInIndexPage()
+    
 
     cmd = "ClientPutComplexDir\n" + "URI=" + uri + "\nIdentifier=" + id
     cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\n"
 
     composer = _static_composer(repo)
+    composer.addIndex(indexpage)
 
     print "Debug: " + cmd + composer.getCmd()
 
