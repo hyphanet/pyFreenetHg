@@ -24,16 +24,55 @@ from mercurial.node import bin
 
 class IndexPageMaker(object):
     """class for generate an index page"""
-    
-    def getBuildInIndexPage(self):
-        return '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n \
+
+    def get_default_index_page(self, data):
+        """generates the built-in version of index.html for repository"""
+
+        template = Template('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n \
                 <html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">\n \
                 <title>Sorry, Not a Freesite</title>\n</head>\n<body>\n \
                 Sorry, this is not a freesite, this is a mercurial repository.<br>\n \
-                Please use hg clone|pull http-static://127.0.0.1:8888/URI to use the repository.<br>\n \
+                Please use hg clone|pull static-http://127.0.0.1:8888/URI to use the repository.<br>\n \
                 <p>&nbsp;</p>\n \
                 created with <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/1/">pyFreenetHg</a>\n \
-                </body>\n</html>\n'    
+                </body>\n</html>\n')
+
+        return template.substitute(data)
+
+    def get_custom_index_page(self, ui):
+        """generates the custom version of index.html for repository"""
+
+        f = open(ui.config('freenethg', 'indextemplate'), 'r')
+        template = Template(f.read())
+        f.close()
+
+        template_data = {'uri' : ui.config('freenethg', 'requesturi') or 'URI',
+                         'fmsuser' : ui.config('freenethg', 'fmsuser') or '',
+                         }
+
+        page = template.substitute(template_data)
+        return page
+
+    def get_index_page(self, ui):
+        """returns index.html page for repository insert.
+           either the built-in version or from a user template"""
+
+        # this dict holds the key-value-pairs for default template
+        # empty at the moment
+        default_data = {}
+
+        if ui.config('freenethg', 'indextemplate'):
+            try:
+                page = self.get_custom_index_page(ui)
+            except Exception, e:
+                print "Error while processing template from %s:" % ui.config('freenethg', 'indextemplate')
+                print e
+                print "Using default template"
+                page = self.get_default_index_page(default_data)
+        else:
+            page = self.get_default_index_page(default_data)
+
+        return page
 
 class FMS_NNTP(NNTP):
     """class for posts to newsgroups on nntp servers"""
@@ -285,7 +324,7 @@ def fcp_makestatic(ui, repo, uri=None, **opts):
     if not opts.get('fcpport'):
         opts['fcpport'] = ui.config('freenethg', 'fcpport')
     cmd = "ClientPutComplexDir\n" + "URI=" + uri + "\nIdentifier=" + id
-    cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\n"
+    cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\nMaxRetries=5\nDontCompress=true\n"
 
     composer = _static_composer(repo)
 
@@ -340,15 +379,13 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
 
     #fcpopts['logfunc'] = ui.log
     node = myFCP(**fcpopts)
-    
-    
-    indexpage = IndexPageMaker().getBuildInIndexPage()
-    
 
     cmd = "ClientPutComplexDir\n" + "URI=" + uri + "\nIdentifier=" + id
-    cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\n"
+    cmd = cmd + "\nVerbosity=-1\nPriorityClass=1\nMaxRetries=5\nDontCompress=true\n"
 
     composer = _static_composer(repo)
+    page_maker = IndexPageMaker()
+    indexpage = page_maker.get_index_page(ui)
     composer.addIndex(indexpage)
 
     print "Debug: " + cmd + composer.getCmd()

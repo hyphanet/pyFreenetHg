@@ -33,8 +33,8 @@ hooks:
 </pre>
 <h3>requirements</h3>
 <p>
-python &gt;= 2.3<br>
-mercurial &gt;= 0.9.x (for accessing pyFreenetHg's repository you need 0.9.3 or later)<br>
+python &gt;= 2.4<br>
+mercurial &gt;= 1.x<br>
 pyFCP<br>
 last not least: a running freenet node ;)<br />
 optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/0/" target="_blank">SiteToolPlugin</a>
@@ -43,6 +43,7 @@ optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8
 <p><a href="FreenetHg.py" target="_blank">download from here</a></p>
 <p>hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&nbsp;/tmp/your/local/path</p>
 <h3>install pyFreenetHg</h3>
+<p><b><i>Important hint:</i></b> Do not store url encoded keys into hgrc (USK%40MY). Python does not like '%' here!</p> 
 <p>download <a href="FreenetHg.py" target="_blank">FreenetHg.py</a> and put it somewhere.<br>
 add the following to your <i>~/.hgrc</i>:
 </p>
@@ -64,6 +65,7 @@ commit = python:freenethg.updatestatic_hook
 
 [freenethg]
 inserturi = USK@foo,bar/Name/1
+requesturi = USK@oof,rab/Name/1
 fcphost = 127.0.0.1
 fcpport = 9481
 </pre>
@@ -74,6 +76,7 @@ commit = python:freenethg.updatestatic_hook2
 
 [freenethg]
 inserturi = USK@foo,bar/Name/1
+requesturi = USK@oof,rab/Name/1
 fcphost = 127.0.0.1
 fcpport = 9481
 uploadkeyword = triggerword
@@ -95,6 +98,57 @@ uploadkeyword = triggerword
 use -1 instaed 1 as edition number to force the node to look for newer editions before delivering data</p>
 <p>way #2<br>
 add the repository USK to your bookmarks, so you get notified if a new edition is found</p>
+
+<h3>Commit notification over freenet</h3>
+
+<pre>
+[freenethg]
+notify = name name2 ...
+messagetemplate = /path/to/template # use for all notifies
+
+[notify_name]
+type = fmsnntp (in progress)
+messagetemplate = /path/to/template # per notify template
+....
+
+[notify_name2]
+type = fmsfcp (not yet)
+....
+
+[notify_name3]
+type = frost (not yet)
+....
+
+[notify_name4]
+type = freemail (not yet)
+....
+
+[notify_name5]
+type = freetalk (not yet)
+....
+
+</pre>
+
+<h3>Default index page</h3>
+The standard hg repository is not a regular freesite, so you get usually a<br>
+"Not in Archive" error if you access the repos uri in fproxy.<br>
+To resolve this problem, pyFreenetHg generates a simple index page.<br>
+&nbsp;<br>
+You can provide your own html template by adding this option:<br>
+&nbsp;<br>
+
+<pre>
+[freenethg]
+indextemplate = /path/to/template
+</pre>
+
+You can use variables in the template which will be replaced by pyFreenetHg.<br>
+At the moment following variables are available:<br>
+&nbsp;<br>
+<ul>
+<li> $uri - the URI of your repository
+<li> $fmsuser - your fms username, if provided in the config (see above)
+</ul>
 
 <!-- h3>eclipse</h3>
 <p>modified MercurialEclipse plugin (vectrace, 0.1.102) to fire fcp-createstatic and fcp-updatestatic from within eclipse</p>
