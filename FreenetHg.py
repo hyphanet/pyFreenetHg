@@ -101,6 +101,43 @@ class FMS_NNTP(NNTP):
 
         return result
 
+
+class Notifier(object):
+    """This object handles all notifications of repository updates or bundle inserts"""
+
+    def __init__(self, ui, notify_data, autorun=False):
+
+        self.ui = ui
+        self.notify_data = notify_data
+
+        if autorun:
+            self.notify()
+
+    def notify(self):
+        uiw = self.ui.walkconfig()
+        trigger = self.ui.config('freenethg','notify')
+
+        for section, key, value in uiw:
+            if 'notify_' in section and key == 'type' and section.replace('notify_','') in trigger:
+                m = getattr(self, value)
+                m(section)
+
+    def fmsnntp(self, config_section):
+        fms_host = self.ui.config(config_section,'fmshost')
+        fms_port = self.ui.config(config_section,'fmsport')
+        fms_user = self.ui.config(config_section,'fmsuser')
+        fms_groups = self.ui.config(config_section,'fmsgroups')
+
+        if fms_host and fms_port and fms_user and fms_groups:
+
+            server = FMS_NNTP(fms_host, fms_user, fms_groups, int(fms_port))
+            result = server.post_updatestatic(self.notify_data['uri'])
+            server.quit()
+
+            print "NNTP result: %s" % str(result)
+
+
+
 class myFCP(fcp.FCPNode):
 
     def putraw(self, id, rawcmd, async=False):
@@ -132,6 +169,25 @@ class myFCP(fcp.FCPNode):
         ticket.waitTillReqSent()
         self.verbosity = fcp.DETAIL
         return ticket.wait()
+
+    def put_static(self, id, rawcmd):
+        """putraw with status callback method"""
+        opts = dict()
+        opts['async'] = True
+        opts['rawcmd'] = rawcmd
+        opts['callback'] = self.put_status
+
+        ticket = self._submitCmd(id, "", **opts)
+        ticket.wait()
+        return ticket.result
+
+    def put_status(self, status, value):
+        """prints the status messages from jobticket"""
+        if status == 'pending' and value['header'] == 'SimpleProgress':
+            print "Succeeded: %d  -  Required: %d  -  Total: %d  -  Failed: %d  -  Final: %s" % (value['Succeeded'], value['Required'], value['Total'], value['FatallyFailed'], value['FinalizedTotal'])
+        if status == 'successful':
+            print "inserted successfully: %s" % value
+
 
 class _static_composer(object):
     """
@@ -253,11 +309,12 @@ def fcp_bundle(ui, repo, **opts):
     #node = fcp.FCPNode(verbosity=fcp.DETAIL)
     node = _make_node(**opts)
 
-    insertresult = node.put(data=bundledata, priority=1, mimetype="mercurial/bundle")
+    print "insert now. this may take a while..."
+
+    insertresult = node.put(data=bundledata, priority=1, mimetype="mercurial/bundle", async=True, callback=node.put_status)
+    insertresult.wait()
 
     node.shutdown()
-
-    print "bundle inserted: " + insertresult
 
 
 def fcp_unbundle(ui, repo, uri , **opts):
@@ -339,14 +396,14 @@ def fcp_makestatic(ui, repo, uri=None, **opts):
 
     try:
         #testresult = node.putraw(id, cmd + composer.getRawCmd())
-        testresult = node.putraw2(id, cmd + composer.getRawCmd())
+        testresult = node.put_static(id, cmd + composer.getRawCmd())
     except fcp.node.FCPException, e:
         print e
 
     node.shutdown()
 
-    if testresult:
-        print "success: " + testresult
+#    if testresult:
+#        print "success: " + testresult
         # here method for automated fms posts should be called
 
 def fcp_createstatic(ui, repo, uri=None, **opts):
@@ -393,31 +450,19 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     print "site composer done."
     print "insert now. this may take a while..."
 
-    testresult = None
+    result = None
 
     try:
-        #testresult = node.putraw(id, cmd + composer.getRawCmd())
-        testresult = node.putraw2(id, cmd + composer.getRawCmd())
+        result = node.put_static(id, cmd + composer.getRawCmd())
     except fcp.node.FCPException, e:
         print e
 
     node.shutdown()
 
-    if testresult:
-        print "success: " + testresult
+    if result:
 
-        fms_host = ui.config('freenethg','fmshost')
-        fms_port = ui.config('freenethg','fmsport')
-        fms_user = ui.config('freenethg','fmsuser')
-        fms_groups = ui.config('freenethg','fmsgroups')
-
-        if fms_host and fms_port and fms_user and fms_groups:
-
-            server = FMS_NNTP(fms_host, fms_user, fms_groups, int(fms_port))
-            result = server.post_updatestatic(testresult)
-            server.quit()
-
-            print "NNTP result: %s" % str(result)
+        notify_data = {'uri':result}
+        notifier = Notifier(ui, notify_data, autorun=True)
 
 
 def updatestatic_hook2(ui, repo, hooktype, node=None, source=None, **kwargs):
