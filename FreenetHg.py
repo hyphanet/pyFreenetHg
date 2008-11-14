@@ -84,14 +84,38 @@ class FMS_NNTP(NNTP):
         self.fms_groups = groups
         NNTP.__init__(self, host, port=port)
 
-    def post_updatestatic(self,uri):
-
+    def post_updatestatic(self, uri, template_path=None):
+        uri = uri.endswith('/') and uri[:-1] or uri
         repository_name = uri.split('/')[1]
+        repository_version = uri.split('/')[2]
+        user_template = None
+        subject_addon = None
 
-        body = 'This is an automated message of pyFreenetHg.\n\nMercurial repository update:\n%s' % uri
+        if template_path:
+            try:
+                f = open(template_path,'r')
+                subject_addon = f.readline().replace('\n','').replace('\r\n','')
+                user_template = f.read()
+                f.close()
+            except Exception, e:
+                print "Error while processing template from %s:" % template_path
+                print e
+                print "Using default template"
+
+        if user_template:
+            body = Template(user_template)
+        else:
+            body = Template('This is an automated message of pyFreenetHg.\n\nMercurial repository update:\n$uri')
+
+        body = body.substitute({'uri':uri})
+
+        subject = 'Repository "%s" updated, Ed. %s' % (repository_name, repository_version)
+
+        if subject_addon:
+            subject += ' %s' % subject_addon
 
         template_data = {'body':body,
-                         'subject':'Update of repository "%s"' % repository_name,
+                         'subject':subject,
                          'fms_user':self.fms_user,
                          'fms_groups':self.fms_groups,}
 
@@ -128,11 +152,12 @@ class Notifier(object):
         fms_port = self.ui.config(config_section,'fmsport')
         fms_user = self.ui.config(config_section,'fmsuser')
         fms_groups = self.ui.config(config_section,'fmsgroups')
+        template_path = self.ui.config(config_section,'messagetemplate')
 
         if fms_host and fms_port and fms_user and fms_groups:
-
+            print "Sending notification..."
             server = FMS_NNTP(fms_host, fms_user, fms_groups, int(fms_port))
-            result = server.post_updatestatic(self.notify_data['uri'])
+            result = server.post_updatestatic(self.notify_data['uri'], template_path=template_path)
             server.quit()
 
             print "NNTP result: %s" % str(result)
@@ -428,7 +453,6 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
     port = ui.config('freenethg', 'fcpport')
 
     uri = ui.config('freenethg', 'inserturi')
-    #uri = "CHK@"
 
     fcpopts = {}
     fcpopts['verbosity'] = fcp.INFO
