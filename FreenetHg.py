@@ -117,10 +117,11 @@ class Notifier(object):
         uiw = self.ui.walkconfig()
         trigger = self.ui.config('freenethg','notify')
 
-        for section, key, value in uiw:
-            if 'notify_' in section and key == 'type' and section.replace('notify_','') in trigger:
-                m = getattr(self, value)
-                m(section)
+        if trigger:
+            for section, key, value in uiw:
+                if 'notify_' in section and key == 'type' and section.replace('notify_','') in trigger:
+                    m = getattr(self, value)
+                    m(section)
 
     def fmsnntp(self, config_section):
         fms_host = self.ui.config(config_section,'fmshost')
