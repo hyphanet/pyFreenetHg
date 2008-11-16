@@ -84,23 +84,32 @@ class FMS_NNTP(NNTP):
         self.fms_groups = groups
         NNTP.__init__(self, host, port=port)
 
-    def post_updatestatic(self, uri, template_path=None):
-        uri = uri.endswith('/') and uri[:-1] or uri
-        repository_name = uri.split('/')[1]
-        repository_version = uri.split('/')[2]
+    def _load_template(self, template_path):
         user_template = None
         subject_addon = None
 
+        try:
+            f = open(template_path,'r')
+            subject_addon = f.readline().replace('\n','').replace('\r\n','')
+            user_template = f.read()
+            f.close()
+        except Exception, e:
+            print "Error while processing template from %s:" % template_path
+            print e
+            print "Using default template"
+
+        return (subject_addon, user_template)
+
+    def post_updatestatic(self, notify_data, template_path=None):
+        uri = notify_data['uri']
+        uri = uri.endswith('/') and uri[:-1] or uri
+        repository_name = uri.split('/')[1]
+        repository_version = uri.split('/')[2]
+
         if template_path:
-            try:
-                f = open(template_path,'r')
-                subject_addon = f.readline().replace('\n','').replace('\r\n','')
-                user_template = f.read()
-                f.close()
-            except Exception, e:
-                print "Error while processing template from %s:" % template_path
-                print e
-                print "Using default template"
+            subject_addon, user_template = self._load_template(template_path)
+        else:
+            subject_addon = user_template = None
 
         if user_template:
             body = Template(user_template)
@@ -125,6 +134,43 @@ class FMS_NNTP(NNTP):
 
         return result
 
+    def post_bundle(self, notify_data, template_path=None):
+
+        if template_path:
+            subject_addon, user_template = self._load_template(template_path)
+        else:
+            subject_addon = user_template = None
+
+        if user_template:
+            body = Template(user_template)
+        else:
+            body = Template('This is an automated message of pyFreenetHg.\n\nBundled changeset:\nBase: $base \nRevision: $rev\nURI: $uri')
+
+        base = ', '.join(notify_data.get('base'))
+        rev = ', '.join(notify_data.get('rev'))
+
+        result = 'Not posted (missing --base and --rev arguments)'
+
+        if base and rev:
+            body = body.substitute({'base':base,
+                                    'rev':rev,
+                                    'uri':notify_data.get('uri')})
+
+            subject = 'Bundled changset for %s' % notify_data.get('repository')
+
+            if subject_addon:
+                subject += ' %s' % subject_addon
+
+            template_data = {'body':body,
+                             'subject':subject,
+                             'fms_user':self.fms_user,
+                             'fms_groups':self.fms_groups,}
+
+            article = StringIO(self.nntp_msg_template.substitute(template_data))
+            result = self.post(article)
+            article.close()
+
+        return result
 
 class Notifier(object):
     """This object handles all notifications of repository updates or bundle inserts"""
@@ -152,12 +198,18 @@ class Notifier(object):
         fms_port = self.ui.config(config_section,'fmsport')
         fms_user = self.ui.config(config_section,'fmsuser')
         fms_groups = self.ui.config(config_section,'fmsgroups')
-        template_path = self.ui.config(config_section,'messagetemplate')
+        updatestatic_template_path = self.ui.config(config_section,'updatestatic_message_template')
+        bundle_template_path = self.ui.config(config_section,'bundle_message_template')
 
         if fms_host and fms_port and fms_user and fms_groups:
             print "Sending notification..."
             server = FMS_NNTP(fms_host, fms_user, fms_groups, int(fms_port))
-            result = server.post_updatestatic(self.notify_data['uri'], template_path=template_path)
+
+            if self.notify_data['type'] == 'updatestatic':
+                result = server.post_updatestatic(self.notify_data, template_path=updatestatic_template_path)
+            elif self.notify_data['type'] == 'bundle':
+                result = server.post_bundle(self.notify_data, template_path=bundle_template_path)
+
             server.quit()
 
             print "NNTP result: %s" % str(result)
@@ -307,7 +359,6 @@ def fcp_bundle(ui, repo, **opts):
     the bundel will be inserted as CHK@ if no uri is given
     see hg help bundle for bundle options
     """
-
     # setup fcp stuff
     # set server, port
     if not opts.get('fcphost'):
@@ -341,6 +392,17 @@ def fcp_bundle(ui, repo, **opts):
     insertresult.wait()
 
     node.shutdown()
+
+    if insertresult:
+
+        notify_data = {'uri' : insertresult,
+                       'type' : 'bundle',
+                       'repository' : '%s' % repo.root.split('/')[-1],
+                       'base' : opts.get('base'),
+                       'rev' : opts.get('rev')}
+
+        notifier = Notifier(ui, notify_data, autorun=True)
+
 
 
 def fcp_unbundle(ui, repo, uri , **opts):
@@ -486,7 +548,9 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
 
     if result:
 
-        notify_data = {'uri':result}
+        notify_data = {'uri' : result,
+                       'type' : 'updatestatic'}
+
         notifier = Notifier(ui, notify_data, autorun=True)
 
 
