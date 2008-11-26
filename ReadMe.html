@@ -21,7 +21,6 @@ working with freenet.<br>
 the basic idea: wrap around (selected) commands and use freenet as transport instead files
      hg fcp-bundle   -> wraps around hg bundle and put a chk/usk instead a local file
      hg fcp-unbundle -> wraps around hg unbundle and get it from a chk/usk instead a local file	
-     hg fcp-makestatic (not yet) -> create a site thats accessible via static-http://127.0.0.1:8888/freenetkey
      hg fcp-updatestatic -> do a commit hook upload, useful if the insert started from commit hook was failed
      
 hooks:
@@ -35,7 +34,6 @@ hooks:
 <p>
 python &gt;= 2.4<br>
 mercurial &gt;= 1.x<br>
-pyFCP<br>
 last not least: a running freenet node ;)<br />
 optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/0/" target="_blank">SiteToolPlugin</a>
 </p>
