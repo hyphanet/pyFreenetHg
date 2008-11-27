@@ -161,12 +161,13 @@ class FCPConnection(FCPIOConnection):
         if extversion < REQUIRED_EXT_VERSION:
             raise Exception("Node-ext to old. Found %d, but need %d" % (extversion, REQUIRED_EXT_VERSION))
     
-    def sendCommand(self, command):
-        self._sendCommand(command.getCommandName(), command.hasData(), command.getItems())
+#    def sendCommand(self, command):
+#        self._sendCommand(command.getCommandName(), command.hasData(), command.getItems())
         
-    def sendCommand(self, command, data):
+    def sendCommand(self, command, data=None):
         self._sendCommand(command.getCommandName(), True, command.getItems())
-        self._sendData(data)
+        if data is not None:
+            self._sendData(data)
         
     def write(self, data):
         self._sendData(data)
@@ -269,13 +270,14 @@ def hgBundlePut(connection, data):
     putcmd.setItem('UploadFrom', 'direct')
     putcmd.setItem('DataLength', len(data))
     
-    connection.sendCommand(putcmd)
-    connection.write(data)
-    
+    connection.sendCommand(putcmd, data)
+
     while True:
         msg = connection.readEndMessage()
         
-        if msg.isMessageName('PutSuccessful'):
+        if msg.isMessageName('PutFetchable') or msg.isMessageName('PutSuccessful'):
+            result = msg.getValue('URI')
+            print "Insert Succeeded at: " + result
             return msg.getValue('URI')
         
         if msg.isMessageName('ProtocolError'):
@@ -288,7 +290,7 @@ def hgBundlePut(connection, data):
             print "Succeeded: %d  -  Required: %d  -  Total: %d  -  Failed: %d  -  Final: %s" % (msg.getIntValue('Succeeded'), msg.getIntValue('Required'), msg.getIntValue('Total'), msg.getIntValue('FatallyFailed'), msg.getValue('FinalizedTotal'))
             continue
 
-        print msg.getMessageName()
+#        print msg.getMessageName()
 
 def hgBundleGet(connection, uri):
     
@@ -318,7 +320,7 @@ def hgBundleGet(connection, uri):
             print "Succeeded: %d  -  Required: %d  -  Total: %d  -  Failed: %d  -  Final: %s" % (msg.getIntValue('Succeeded'), msg.getIntValue('Required'), msg.getIntValue('Total'), msg.getIntValue('FatallyFailed'), msg.getValue('FinalizedTotal'))
             continue
 
-        print msg.getMessageName()
+#        print msg.getMessageName()
             
 #
 # fcp rape end
@@ -725,7 +727,10 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
             msg = conn.readEndMessage()
         
             if msg.isMessageName('PutSuccessful'):
-                return msg.getValue('URI')
+                result = msg.getValue('URI')
+                if None == hooktype:
+                    print "Insert Succeeded at: " + result
+                break
         
             if msg.isMessageName('ProtocolError'):
                 raise Exception("ProtocolError(%d) - %s: %s" % (msg.getIntValue('Code'), msg.getValue('CodeDescription'), msg.getValue('ExtraDescription')))
@@ -737,7 +742,7 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
                 print "Succeeded: %d  -  Required: %d  -  Total: %d  -  Failed: %d  -  Final: %s" % (msg.getIntValue('Succeeded'), msg.getIntValue('Required'), msg.getIntValue('Total'), msg.getIntValue('FatallyFailed'), msg.getValue('FinalizedTotal'))
                 continue
 
-            print msg.getMessageName()
+            #print msg.getMessageName()
 
     except Exception, e:
         print e

@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Freenet and mercurial</title>
+<style type="text/css">@import url("schmucklos.css?type=text/css");</style>
 </head>
 <body style="margin: 1cm">
 <p>&nbsp;</p>
@@ -61,7 +62,7 @@
 <p>
 Mercurial is written in python and has a plugin system. so it should not be to much difficulty to get it
 working with freenet.<br>
-<pre>
+<pre xml:space="preserve" class="wiki">
 the basic idea: wrap around (selected) commands and use freenet as transport instead of files
      hg fcp-bundle   -> wraps around hg bundle and put a chk/usk instead a local file
      hg fcp-unbundle -> wraps around hg unbundle and get it from a chk/usk instead a local file	
@@ -91,7 +92,7 @@ optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8
 <p>download <a href="FreenetHg.py" target="_blank">FreenetHg.py</a> and put it somewhere.<br>
 add the following to your <i>~/.hgrc</i>:
 </p>
-<pre>
+<pre xml:space="preserve" class="wiki">
 [extensions]
 freenethg=/path/to/FreenetHg.py
 </pre>
@@ -102,7 +103,7 @@ config settings can also be placed in your global config file <i>~/.hgrc</i>.
 
 <a name="conf_username"><h4>Username</h4></a>
 <p>To prevent identity leaks you should add a username to each <i>./hg/hgrc</i>:
-<pre>
+<pre xml:space="preserve" class="wiki">
 [ui]
 username = Your Name
 </pre>
@@ -118,7 +119,7 @@ Put one of these in per-repository <i>./hg/hgrc</i>:<BR>
 </p>
 <a name="conf_updatestatic_hook"><h5>updatestatic_hook</h5></a>
 This is the most simple hook. The repository gets updated on every commit.
-<pre>
+<pre xml:space="preserve" class="wiki">
 [hooks]
 commit = python:freenethg.updatestatic_hook
 
@@ -131,7 +132,7 @@ fcpport = 9481
 <a name="conf_updatestatic_hook2"><h5>updatestatic_hook2</h5></a>
 With this hook configuration, update of repository only takes place if the given <i>uploadkeyword</i> is in the commit message.
 (The repository can be updated at any time with <i>hg fcp-updatestatic</i>).
-<pre>
+<pre xml:space="preserve" class="wiki">
 [hooks]
 commit = python:freenethg.updatestatic_hook2
 
@@ -144,7 +145,7 @@ uploadkeyword = triggerword
 </pre>
 <a name="conf_updatestatic_hook3"><h5>updatestatic_hook3</h5></a>
 This hook is still under development. It will use the SiteToolPlugin to reduce the size of inserts for big repositories.
-<pre>
+<pre xml:space="preserve" class="wiki">
 [hooks]
 commit = python:freenethg.updatestatic_hook3
 
@@ -203,7 +204,7 @@ To resolve this problem, pyFreenetHg generates a simple index page.<br>
 You can provide your own html template by adding this option to section <i>freenethg</i>:<br>
 &nbsp;<br>
 
-<pre>
+<pre xml:space="preserve" class="wiki">
 [freenethg]
 indextemplate = /path/to/template
 </pre>
@@ -224,7 +225,7 @@ only FMS is supported, but email and several other will follow soon.</p>
 <p>
 First, put a <i>notify=&lt;group&gt;</i> in your <i>.hg/hgrc</i>, then add a special config section for this group.<br>
 
-<pre>
+<pre xml:space="preserve" class="wiki">
 [freenethg]
 notify = name name2 ...
 
@@ -247,7 +248,7 @@ Look at the example for FMS notification for better explanation.
 <a name="not_fms"><h4>FMS</h4></a>
 This is an example notification config for FMS:
 
-<pre>
+<pre xml:space="preserve" class="wiki">
 [freenethg]
 .
 .
@@ -255,8 +256,8 @@ notify = fmstest
 
 [notify_fmstest]
 type = fmsnntp
-updatestatic_message_template = /home/klaus/devel/fmstemplate.txt (optional)
-bundle_message_template = /home/klaus/devel/fmstemplate_bundle.txt (optional)
+updatestatic_message_template = /path/to/fmstemplate.txt (optional)
+bundle_message_template = /path/to/fmstemplate_bundle.txt (optional)
 fmsuser = Alice
 fmshost = 127.0.0.1
 fmsport = 1119
