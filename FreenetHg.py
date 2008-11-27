@@ -161,11 +161,12 @@ class FCPConnection(FCPIOConnection):
         if extversion < REQUIRED_EXT_VERSION:
             raise Exception("Node-ext to old. Found %d, but need %d" % (extversion, REQUIRED_EXT_VERSION))
     
-#    def sendCommand(self, command):
-#        self._sendCommand(command.getCommandName(), command.hasData(), command.getItems())
-        
     def sendCommand(self, command, data=None):
-        self._sendCommand(command.getCommandName(), True, command.getItems())
+        if data is None:
+            hasdata = command.hasData()
+        else:
+            hasdata = True
+        self._sendCommand(command.getCommandName(), hasdata, command.getItems())
         if data is not None:
             self._sendData(data)
         
