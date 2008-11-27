@@ -10,37 +10,69 @@
 <p><a href="/?newbookmark=USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/1/&amp;desc=Freenet and Mercurial" target="_blank">add to bookmarks: Freenet and Mercurial</a></p>
 <p><a href="/?newbookmark=USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&amp;desc=Freenet and Mercurial (repository)" target="_blank">add to bookmarks: Freenet and Mercurial (repository)</a></p>
 <p>&nbsp;</p>
-<h3>licence</h3>
+<h2>Table of Content</h2>
+<ul>
+<li><a href="#licence">Licence</a>
+<li><a href="#about">About</a>
+<li><a href="#requirements">Requirements</a>
+<li><a href="#download">Download</a>
+<li><a href="#installation">Installation</a>
+<li><a href="#configuration">Configuration</a>
+    <ul>
+    <li><a href="#conf_username">Username</a>
+    <li><a href="#conf_hooks">Hooks</a>
+        <ul>
+        <li><a href="#conf_updatestatic_hook">updatestatic_hook</a>
+        <li><a href="#conf_updatestatic_hook2">updatestatic_hook2</a>
+        <li><a href="#conf_updatestatic_hook2">updatestatic_hook3</a> (work in progress)
+        </ul>
+    </ul>
+<li><a href="#templates">Templates</a>
+    <ul>
+    <li><a href="#templ_indexpage">Repository Indexpage Template</a>
+    <li><a href="#templ_bundle">Bundle Indexpage Template</a>
+    </ul>
+<li><a href="#notifications">Notifications</a>
+    <ul>
+    <li><a href="#not_fms">FMS</a>
+    <li><a href="#not_other">Other ways to get informed on repository updates</a>
+    </ul>
+</ul>
+
+<a name="licence"><h3>Licence</h3></a>
 <p>this document and pyFreenetHg is published under the strong WTFPL</p>
 <a href="COPYING" target="_blank">licence</a>
-<h3>pyFreenetHg</h3>
+<a name="about"><h3>About pyFreenetHg</h3></a>
 <p>
-Mercurial is written in phyton and have a plugin system. so it should not be to much difficulty to get it
+Mercurial is written in python and has a plugin system. so it should not be to much difficulty to get it
 working with freenet.<br>
 <pre>
-the basic idea: wrap around (selected) commands and use freenet as transport instead files
+the basic idea: wrap around (selected) commands and use freenet as transport instead of files
      hg fcp-bundle   -> wraps around hg bundle and put a chk/usk instead a local file
      hg fcp-unbundle -> wraps around hg unbundle and get it from a chk/usk instead a local file	
+     hg fcp-makestatic -> create a site thats accessible via static-http://127.0.0.1:8888/freenetkey
      hg fcp-updatestatic -> do a commit hook upload, useful if the insert started from commit hook was failed
      
-hooks:
+commit hooks:
      updatestatic_hook -> does a full upload on each commit
      updatestatic_hook2 -> upload is only triggered on keyword in commit message
      updatestatic_hook3 (in progress) -> upload is only triggered on keyword in commit message
                                       -> SiteToolPlugin is used to reduce upload size on large trees (if plugin is installed)     
 
 </pre>
-<h3>requirements</h3>
+<a name="requirements"><h3>Requirements</h3></a>
 <p>
 python &gt;= 2.4<br>
 mercurial &gt;= 1.x<br>
 last not least: a running freenet node ;)<br />
+knowledge about hg native commands <i>makestatic</i> and <i>bund/unbundle</i><br>
 optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/0/" target="_blank">SiteToolPlugin</a>
 </p>
-<h3>getting</h3>
+<a name="download"><h3>Download</h3>
 <p><a href="FreenetHg.py" target="_blank">download from here</a></p>
 <p>hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&nbsp;/tmp/your/local/path</p>
-<h3>install pyFreenetHg</h3>
+
+<a name="installation"><h3>Installation</h3></a>
 <p><b><i>Important hint:</i></b> Do not store url encoded keys into hgrc (USK%40MY). Python does not like '%' here!</p> 
 <p>download <a href="FreenetHg.py" target="_blank">FreenetHg.py</a> and put it somewhere.<br>
 add the following to your <i>~/.hgrc</i>:
@@ -49,14 +81,29 @@ add the following to your <i>~/.hgrc</i>:
 [extensions]
 freenethg=/path/to/FreenetHg.py
 </pre>
-<h3>per repository configuration</h3>
-<p>To prevent identity leaks you should add an username to each <i>./hg/hgrc</i>:
+<a name="configuration"><h3>Configuration</h3></a>
+Most of the configuration is taking place on a per-repository basis. The config file for this can be found in
+each mercurial repository in directory <i>.hg/hgrc</i>. Depending on how many different repositories you manage, some of the
+config settings can also be placed in your global config file <i>~/.hgrc</i>.
+
+<a name="conf_username"><h4>Username</h4></a>
+<p>To prevent identity leaks you should add a username to each <i>./hg/hgrc</i>:
 <pre>
 [ui]
-username = &lt;thenametouse&gt;
+username = Your Name
 </pre>
-<p>adding hook for auto update (<i>./hg/hgrc</i>):</p>
+Examples:<BR>
+username = Alice<BR>
+username = bob@test.com<BR>
+username = Charlie &lt;ch@devs.freemail&gt;<BR>
+<a name="conf_hooks"><h4>Hooks</h4></a>
+<p>Usually, repositories in freenet can be updated after committing with <i>hg fcp-updatestatic</i> (executed in your repository directory).
+To automate this, several hooks can be used.<BR>
+
+Put one of these in per-repository <i>./hg/hgrc</i>:<BR>
 </p>
+<a name="conf_updatestatic_hook"><h5>updatestatic_hook</h5></a>
+This is the most simple hook. The repository gets updated on every commit.
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic_hook
@@ -67,7 +114,9 @@ requesturi = USK@oof,rab/Name/1
 fcphost = 127.0.0.1
 fcpport = 9481
 </pre>
-or
+<a name="conf_updatestatic_hook2"><h5>updatestatic_hook2</h5></a>
+With this hook configuration, update of repository only takes place if the given <i>uploadkeyword</i> is in the commit message.
+(The repository can be updated at any time with <i>hg fcp-updatestatic</i>).
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic_hook2
@@ -79,7 +128,8 @@ fcphost = 127.0.0.1
 fcpport = 9481
 uploadkeyword = triggerword
 </pre>
-or
+<a name="conf_updatestatic_hook3"><h5>updatestatic_hook3</h5></a>
+This hook is still under development. It will use the SiteToolPlugin to reduce the size of inserts for big repositories.
 <pre>
 [hooks]
 commit = python:freenethg.updatestatic_hook3
@@ -91,48 +141,14 @@ fcphost = 127.0.0.1
 fcpport = 9481
 uploadkeyword = triggerword
 </pre>
-<h3>How to deal with updates over freenet</h3>
-<p>way #1<br>
-use -1 instaed 1 as edition number to force the node to look for newer editions before delivering data</p>
-<p>way #2<br>
-add the repository USK to your bookmarks, so you get notified if a new edition is found</p>
 
-<h3>Commit notification over freenet</h3>
-
-<pre>
-[freenethg]
-notify = name name2 ...
-messagetemplate = /path/to/template # use for all notifies
-
-[notify_name]
-type = fmsnntp (in progress)
-messagetemplate = /path/to/template # per notify template
-....
-
-[notify_name2]
-type = fmsfcp (not yet)
-....
-
-[notify_name3]
-type = frost (not yet)
-....
-
-[notify_name4]
-type = freemail (not yet)
-....
-
-[notify_name5]
-type = freetalk (not yet)
-....
-
-</pre>
-
-<h3>Default index page</h3>
-The standard hg repository is not a regular freesite, so you get usually a<br>
-"Not in Archive" error if you access the repos uri in fproxy.<br>
+<a name="templates"><h3>Templates</h3></a>
+<a name="templ_indexpage"><h4>Repository Indexpage Template</h4></a>
+The standard hg repository is not a regular freesite, so you get usually a "Not in Archive" error if you access the repository
+uri in fproxy.<br>
 To resolve this problem, pyFreenetHg generates a simple index page.<br>
 &nbsp;<br>
-You can provide your own html template by adding this option:<br>
+You can provide your own html template by adding this option to section <i>freenethg</i>:<br>
 &nbsp;<br>
 
 <pre>
@@ -141,12 +157,88 @@ indextemplate = /path/to/template
 </pre>
 
 You can use variables in the template which will be replaced by pyFreenetHg.<br>
-At the moment following variables are available:<br>
-&nbsp;<br>
+At the moment following variables are available:
 <ul>
 <li> $uri - the URI of your repository
-<li> $fmsuser - your fms username, if provided in the config (see above)
+<li> $fmsuser - your fms username, if provided in the config (see section about notifications)
 </ul>
+
+<a name="templ_bundle"><h4>Bundle Indexpage Template</h4></a>
+This is still work in progress. Bundles will get a history freesite with list of changeset for a specific repository.
+
+<a name="notifications"><h3>Notifications</h3></a>
+<p>pyFreenetHg can notify configurable groups of people about your repository and bundle inserts. At the moment,
+only FMS is supported, but email and several other will follow soon.</p>
+<p>
+First, put a <i>notify=&lt;group&gt;</i> in your <i>.hg/hgrc</i>, then add a special config section for this group.<br>
+
+<pre>
+[freenethg]
+notify = name name2 ...
+
+[notify_name]
+type = fmsnntp
+.
+.
+.
+
+[notify_name2]
+type = freemail
+.
+.
+.
+
+</pre>
+
+Look at the example for FMS notification for better explanation.
+</p>
+<a name="not_fms"><h4>FMS</h4></a>
+This is an example notification config for FMS:
+
+<pre>
+[freenethg]
+.
+.
+notify = fmstest
+
+[notify_fmstest]
+type = fmsnntp
+updatestatic_message_template = /home/klaus/devel/fmstemplate.txt (optional)
+bundle_message_template = /home/klaus/devel/fmstemplate_bundle.txt (optional)
+fmsuser = Alice
+fmshost = 127.0.0.1
+fmsport = 1119
+fmsgroups = pyfreenethg, programming
+</pre>
+
+<p>
+This will send an FMS post to groups <i>pyfreenethg, programming</i> with FMS user <i>Alice</i> everytime you execute one
+of the commands fcp-updatestatic or fcp-bundle.
+</p>
+<b>custom message templates</b><br>
+You can specify custom message templates. The first line of the template will be used as additin to the Subject line. The rest is treated
+as body.<br>
+Following variables are available for updatestatic templates:
+<ul>
+<li> $uri - the URI of your repository
+</ul>
+Following variables are available for bundle templates:
+<ul>
+<li> $base - the base changeset of your bundle
+<li> $rev - the revision of your bundle
+</ul>
+Both of these variables are taken from the commandline of your <i>hg fcp-bundle</i> command, e.g.:
+<pre>
+hg fcp-bundle --base ff3a3454cd13 --rev c293b1bd3182
+</pre>
+
+<a name="not_other"><h4>Other ways to get informed on repository updates</h4></a>
+<p>way #1<br>
+use -1 instaed 1 as edition number to force the node to look for newer editions before delivering data</p>
+<p>way #2<br>
+add the repository USK to your bookmarks, so you get notified if a new edition is found</p>
+
+
 
 <!-- h3>eclipse</h3>
 <p>modified MercurialEclipse plugin (vectrace, 0.1.102) to fire fcp-createstatic and fcp-updatestatic from within eclipse</p>
