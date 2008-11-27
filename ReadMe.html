@@ -27,6 +27,21 @@
         <li><a href="#conf_updatestatic_hook2">updatestatic_hook3</a> (work in progress)
         </ul>
     </ul>
+<li><a href="#usage">Usage</a>
+    <ul>
+    <li><a href="#usage_sharing">Sharing Changes</a>
+        <ul>
+        <li><a href="#usage_oneshot">One-shot Repository</a>
+        <li><a href="#usage_permanent">Creating/updating a more permanent Repository</a>
+        <li><a href="#usage_bundle">Creating bundles</a>
+        </ul>
+    <li><a href="#usage_get">Getting Changes</a>
+        <li><a href="#usage_unbundle">Unbundling</a>
+        <li><a href="#usage_clone">Fetching (cloning) a repository</a>
+        <li><a href="#usage_pull">Pulling changes from a repository</a>
+    </ul>
+
+
 <li><a href="#templates">Templates</a>
     <ul>
     <li><a href="#templ_indexpage">Repository Indexpage Template</a>
@@ -50,7 +65,6 @@ working with freenet.<br>
 the basic idea: wrap around (selected) commands and use freenet as transport instead of files
      hg fcp-bundle   -> wraps around hg bundle and put a chk/usk instead a local file
      hg fcp-unbundle -> wraps around hg unbundle and get it from a chk/usk instead a local file	
-     hg fcp-makestatic -> create a site thats accessible via static-http://127.0.0.1:8888/freenetkey
      hg fcp-updatestatic -> do a commit hook upload, useful if the insert started from commit hook was failed
      
 commit hooks:
@@ -65,7 +79,7 @@ commit hooks:
 python &gt;= 2.4<br>
 mercurial &gt;= 1.x<br>
 last not least: a running freenet node ;)<br />
-knowledge about hg native commands <i>makestatic</i> and <i>bund/unbundle</i><br>
+knowledge about hg native commands <i>bundle/unbundle</i><br>
 optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/0/" target="_blank">SiteToolPlugin</a>
 </p>
 <a name="download"><h3>Download</h3>
@@ -140,6 +154,44 @@ requesturi = USK@oof,rab/Name/1
 fcphost = 127.0.0.1
 fcpport = 9481
 uploadkeyword = triggerword
+</pre>
+
+<a name="usage"><h3>Usage</h3></a>
+<a name="usage_sharing"><h4>Sharing Changes</h4></a>
+<a name="usage_oneshot"><h5>One-shot Repository</h5></a>
+To insert a repository with a unique key, change to your repository working directory and use this command:
+<pre>
+hg fcp-updatestatic --uri=CHK@
+</pre>
+This circumvents your inserturi settings of the config file and uses a simple CHK key.
+<a name="usage_permanent"><h5>Creating/updating a more permanent Repository</h5></a>
+To create and update a repository under a USK, just change to your repository working directory and use this command:
+<pre>
+hg fcp-updatestatic
+</pre>
+This will use the inserturi from your configfile. The node will take care of USK versioning.
+<a name="usage_bundle"><h5>Creating bundles</h5></a>
+You can bundle specific changesets and insert them as CHK. Example:
+<pre>
+hg fcp-bundle --base 5345e333a19b --rev 80f52220ea7c
+</pre>
+This creates a hg bundle of changes between revision 5345e333a19b and 80f52220ea7c and inserts this as CHK.
+For more information on bundle command, see the mercurial documentation.
+<a name="usage_sharing"><h4>Getting Changes</h4></a>
+<a name="usage_unbundle"><h5>Unbundling</h5></a>
+To merge a bundled changeset into your repository, change to the working directory and use:
+<pre>
+hg fcp-unbundle CHK@....
+</pre>
+<a name="usage_clone"><h5>Fetching (cloning) a repository</h5></a>
+To clone another repository, just use the normal hg command <i>clone</i> and use static-http as transport:
+<pre>
+hg clone static-http://127.0.0.1:8888/USK@..../&lt;version&gt;
+</pre>
+<a name="usage_pull"><h5>Pulling changes from a repository</h5></a>
+The same applies for pulling changes into an existing repository:
+<pre>
+hg pull static-http://127.0.0.1:8888/USK@..../&lt;version&gt;
 </pre>
 
 <a name="templates"><h3>Templates</h3></a>

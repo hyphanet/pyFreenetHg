@@ -6,7 +6,8 @@
 # To Public License, Version 2, as published by Sam Hocevar. See
 # http://sam.zoy.org/wtfpl/COPYING for more details. */
 
-import os, time
+import os
+import time
 import tempfile
 import random
 import socket
@@ -84,17 +85,17 @@ class FCPIOConnection(object):
                 raise Exception("FCP socket closed by node")
             remaining -= chunklen
         buf = "".join(chunks)
-        print "testi: in:<"+str(len(buf))+" Bytes of data>" 
+#        print "testi: in:<"+str(len(buf))+" Bytes of data>" 
         return buf
 
     def readEndMessage(self):
         #the first line is the message name
         messagename = self._readline()
-        print "testi: in:"+messagename
+#        print "testi: in:"+messagename
         items = {}
         while True:
             line = self._readline();
-            print "testi: in:"+line
+#            print "testi: in:"+line
             if (len(line.strip()) == 0):
                 continue # an empty line, jump over
             
@@ -109,7 +110,7 @@ class FCPIOConnection(object):
         return FCPMessage(messagename, items, endmarker)
     
     def _sendLine(self, line):
-        print "testi: out:"+line
+#        print "testi: out:"+line
         self.socket.sendall(line+"\n")
     
     def _sendMessage(self, messagename, hasdata=False, **kw):
@@ -133,7 +134,7 @@ class FCPIOConnection(object):
             self._sendLine("EndMessage")
     
     def _sendData(self, data):
-        print "testi: out:<"+str(len(data))+" Bytes of data>" 
+#        print "testi: out:<"+str(len(data))+" Bytes of data>" 
         self.socket.sendall(data)
 
 class FCPConnection(FCPIOConnection):
@@ -540,6 +541,8 @@ class _static_composer(object):
                 pass # store parsed later explizit
             elif s == 'wlock':
                 pass # called from hook, ignore
+            elif os.path.isdir(self._rootdir +'/'+s):
+                pass # unexpected dir, ignore
             else:
                 self._addItem('', s)
 
