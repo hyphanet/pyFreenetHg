@@ -11,25 +11,31 @@
 <p><a href="/?newbookmark=USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/1/&amp;desc=Freenet and Mercurial" target="_blank">add to bookmarks: Freenet and Mercurial</a></p>
 <p><a href="/?newbookmark=USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/1/&amp;desc=Freenet and Mercurial (repository)" target="_blank">add to bookmarks: Freenet and Mercurial (repository)</a></p>
 <p>&nbsp;</p>
-<h2>Table of Content</h2>
+<h2><a name="toc">Table of Content</a></h2>
 <ul>
-<li><a href="#licence">Licence</a>
-<li><a href="#about">About</a>
-<li><a href="#requirements">Requirements</a>
-<li><a href="#download">Download</a>
-<li><a href="#installation">Installation</a>
+<li><a href="#licence">Licence</a></li>
+<li><a href="#about">About</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#download">Download</a></li>
+<li><a href="#installation">Installation</a></li>
 <li><a href="#configuration">Configuration</a>
     <ul>
-    <li><a href="#conf_username">Username</a>
+    <li><a href="#conf_setupwitz">Configuration wizard</a></li>
+    <li><a href="#conf_defaults">Default settings</a></li>
+    <li><a href="#conf_environment">Environment variables</a></li>
+    <li><a href="#conf_username">Username</a></li>
     <li><a href="#conf_hooks">Hooks</a>
         <ul>
-        <li><a href="#conf_updatestatic_hook">updatestatic_hook</a>
-        <li><a href="#conf_updatestatic_hook2">updatestatic_hook2</a>
-        <li><a href="#conf_updatestatic_hook2">updatestatic_hook3</a> (work in progress)
+        <li><a href="#conf_updatestatic_hook">updatestatic_hook</a></li>
+        <li><a href="#conf_updatestatic_hook2">updatestatic_hook2</a></li>
+        <li><a href="#conf_updatestatic_hook2">updatestatic_hook3</a> (work in progress)</li>
         </ul>
+    </li>
     </ul>
+</li>
 <li><a href="#usage">Usage</a>
     <ul>
+    <li><a href="#usage_cmdlineparams">Command line parameters</a></li>
     <li><a href="#usage_sharing">Sharing Changes</a>
         <ul>
         <li><a href="#usage_oneshot">One-shot Repository</a>
@@ -37,12 +43,13 @@
         <li><a href="#usage_bundle">Creating bundles</a>
         </ul>
     <li><a href="#usage_get">Getting Changes</a>
-        <li><a href="#usage_unbundle">Unbundling</a>
-        <li><a href="#usage_clone">Fetching (cloning) a repository</a>
-        <li><a href="#usage_pull">Pulling changes from a repository</a>
-    </ul>
-
-
+		<ul>
+        	<li><a href="#usage_unbundle">Unbundling</a>
+        	<li><a href="#usage_clone">Fetching (cloning) a repository</a>
+        	<li><a href="#usage_pull">Pulling changes from a repository</a>
+		</ul>
+    </li>
+</li>
 <li><a href="#templates">Templates</a>
     <ul>
     <li><a href="#templ_indexpage">Repository Indexpage Template</a>
@@ -55,10 +62,10 @@
     </ul>
 </ul>
 
-<a name="licence"><h3>Licence</h3></a>
+<h3><a name="licence">Licence</a></h3>
 <p>this document and pyFreenetHg is published under the strong WTFPL</p>
 <a href="COPYING" target="_blank">licence</a>
-<a name="about"><h3>About pyFreenetHg</h3></a>
+<h3><a name="about">About pyFreenetHg</a></h3>
 <p>
 Mercurial is written in python and has a plugin system. so it should not be to much difficulty to get it
 working with freenet.<br>
@@ -84,8 +91,10 @@ knowledge about hg native commands <i>bundle/unbundle</i><br>
 optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/SiteToolPlugin/6/" target="_blank">SiteToolPlugin</a>
 </p>
 <a name="download"><h3>Download</h3>
-<p><a href="FreenetHg.py" target="_blank">download from here</a></p>
-<p>hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/45/&nbsp;/tmp/your/local/path</p>
+<p><a href="FreenetHg.py" target="_blank">download latest testverion from here</a></p>
+<p><a href="/SSK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg-20/FreenetHg.py" target="_blank">download version 0.1.1 from here</a></p>
+<p>or get the working repository here:<br>
+hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/76/&nbsp;/tmp/your/local/path</p>
 
 <a name="installation"><h3>Installation</h3></a>
 <p><b><i>Important hint:</i></b> Do not store url encoded keys into hgrc (USK%40MY). Python does not like '%' here!</p> 
@@ -96,11 +105,31 @@ add the following to your <i>~/.hgrc</i>:
 [extensions]
 freenethg=/path/to/FreenetHg.py
 </pre>
-<a name="configuration"><h3>Configuration</h3></a>
+<h3><a name="configuration">Configuration</a></h3>
 Most of the configuration is taking place on a per-repository basis. The config file for this can be found in
 each mercurial repository in directory <i>.hg/hgrc</i>. Depending on how many different repositories you manage, some of the
 config settings can also be placed in your global config file <i>~/.hgrc</i>.
 
+<h4><a name="conf_setupwitz">Configuration wizard</a></h4>
+pyFreenetHg provides a simple setup wizard that configure fcp settings and hooks.
+<pre xml:space="preserve" class="wiki">
+hg setupwitz
+</pre>
+<a name="conf_defaults"><h4>Default settings</h4></a>
+If fcp settings are neither configured in hgrc nor environment variables are set nor given as commandline parameters, the fcp settings defaults to following values:
+<ul>
+<li>fcp host: 127.0.0.1</li>
+<li>fcp port: 9481</li>
+<li>fcp timeout: 5 minutes</li>
+</ul>
+<a name="conf_environment"><h4>Environment variables</h4></a>
+The following environment variables are supported:
+<ul>
+<li>"FCP_HOST" - a string that represents the fcp host adress</li>
+<li>"FCP_PORT" - the fcp port number (1-65365)</li>
+<li>"FCP_TIMEOUT" - the connection timeout in seconds</li>
+<li>"FCP_NOVERSION" - if set the fcp version check is omitted</li>
+</ul>
 <a name="conf_username"><h4>Username</h4></a>
 <p>To prevent identity leaks you should add a username to each <i>./hg/hgrc</i>:
 <pre xml:space="preserve" class="wiki">
@@ -158,43 +187,111 @@ uploadkeyword = triggerword
 </pre>
 
 <a name="usage"><h3>Usage</h3></a>
+
+<a name="usage_cmdlineparams"><h4>Command line parameters</h4></a>
+
+<h5>fcp configuration parameters</h5>
+<dl>
+<dt>--fcphost hostnameorip</dt><dd>specify fcphost if not 127.0.0.1</dd>
+<dt>--fcpport portnumber</dt><dd>specify fcpport if not 9481</dd>
+<dt>--fcptimeout seconds</dt><dd>specify fcp timeout if not 5 minutes</dd>
+<dt>--fcplog</dt><dd>log fcp to mercurials output</dd>
+<dt>--fcpnoversion</dt><dd>omit fcp version check</dd>
+</dl>
+<h5>fcp put parameters</h5>
+<dl>
+<dt>--fcpdontcompress</dt><dd>if specified node compression is turned off</dd>
+<dt>--globalput</dt><dd>use gloabal queue and persistance "forever" for fcp put</dd>
+</dl>
+<h5>notify parameters</h5>
+<dl>
+<dt>--nonotify</dt><dd>suppress all notifies</dd>
+</dl>
+
 <a name="usage_sharing"><h4>Sharing Changes</h4></a>
 <a name="usage_oneshot"><h5>One-shot Repository</h5></a>
 To insert a repository with a unique key, change to your repository working directory and use this command:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg fcp-updatestatic --uri=CHK@
 </pre>
 This circumvents your inserturi settings of the config file and uses a simple CHK key.
 <a name="usage_permanent"><h5>Creating/updating a more permanent Repository</h5></a>
 To create and update a repository under a USK, just change to your repository working directory and use this command:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg fcp-updatestatic
 </pre>
 This will use the inserturi from your configfile. The node will take care of USK versioning.
 <a name="usage_bundle"><h5>Creating bundles</h5></a>
 You can bundle specific changesets and insert them as CHK. Example:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg fcp-bundle --base 5345e333a19b --rev 80f52220ea7c
 </pre>
 This creates a hg bundle of changes between revision 5345e333a19b and 80f52220ea7c and inserts this as CHK.
 For more information on bundle command, see the mercurial documentation.
-<a name="usage_sharing"><h4>Getting Changes</h4></a>
+<a name="usage_get"><h4>Getting Changes</h4></a>
 <a name="usage_unbundle"><h5>Unbundling</h5></a>
 To merge a bundled changeset into your repository, change to the working directory and use:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg fcp-unbundle CHK@....
 </pre>
-<a name="usage_clone"><h5>Fetching (cloning) a repository</h5></a>
+<ul>
+<li>
+<a name="usage_clone"><i>without pyFreenetHg installed or version 0.1.1 or earlier</i></a>
+<h5>Fetching (cloning) a repository</h5>
 To clone another repository, just use the normal hg command <i>clone</i> and use static-http as transport:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg clone static-http://127.0.0.1:8888/USK@..../&lt;version&gt;
 </pre>
 <a name="usage_pull"><h5>Pulling changes from a repository</h5></a>
 The same applies for pulling changes into an existing repository:
-<pre>
+<pre xml:space="preserve" class="wiki">
 hg pull static-http://127.0.0.1:8888/USK@..../&lt;version&gt;
 </pre>
+</li>
+<li>
+<a name="usage_clone_fcp"><i>this pyFreenetHg version or later installed</i></a>
+<h5>Fetching (cloning) a repository</h5>
+To clone another repository, just use the normal hg command <i>clone</i> and use FCP (Freenet Client Protocol) as transport:
+<pre xml:space="preserve" class="wiki">
+hg clone fcp://127.0.0.1:9481/USK@..../&lt;version&gt;
+</pre>
+<a name="usage_pull_fcp"><h5>Pulling changes from a repository</h5></a>
+The same applies for pulling changes into an existing repository:
+<pre xml:space="preserve" class="wiki">
+hg pull fcp://127.0.0.1:9481/USK@..../&lt;version&gt;
+</pre>
+<a name="fcp_uri_scheme"><h5>FCP uri scheme</h5></a>
+<pre xml:space="preserve" class="wiki">
+fcp://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;freenetkey&gt;;&lt;connectionparams&gt;?&lt;commandparams&gt;
+</pre>
+The fcp uri scheme looks like the http uri scheme. Username and password are defined for future use, but currently ignored.
+If the host or port is not given, the value from hgrc or environment is taken. If none is found, it defaults to 127.0.0.1:9481<br>
+<ul>
+<li>connection parameters. have only effect if new connections are created
+<dl>
+<dt>FCPLog</dt><dd>if the parameter is set, any value turns logging on (<i>default: off</i>)</dd>
+<dt>NoVersion</dt><dd>if the parameter is set, any value turns the fcp version check off (<i>default: on</i>)</dd>
+<dt>Timeout</dt><dd>set timeout to the amount of seconds (<i>default: 300</i>)</dd>
+</dl>
+</li>
+<li>command parameters
+<dl>
+<dt>Priority</dt><dd>the priority class for the request (0...6) (<i>default: 1</i>)</dd>
+<dt>MaxRetries</dt><dd>set the max retry count. -1 retries forever (<i>default: 5</i>)</dd>
+</dl>
+</li>
+</ul>
+Sample uris:
+<pre xml:space="preserve" class="wiki">
+fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/
+fcp:///USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/
+fcp:USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/ 
+fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/;FCPLog=true&TimeOut=300?Priority=1&MaxRetries=5                                               
+fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/?Priority=0&MaxRetries=-1                                               
+</pre>
 
+</li>
+</ul>
 <a name="templates"><h3>Templates</h3></a>
 <a name="templ_indexpage"><h4>Repository Indexpage Template</h4></a>
 The standard hg repository is not a regular freesite, so you get usually a "Not in Archive" error if you access the repository
@@ -222,6 +319,7 @@ This is still work in progress. Bundles will get a history freesite with list of
 <a name="notifications"><h3>Notifications</h3></a>
 <p>pyFreenetHg can notify configurable groups of people about your repository and bundle inserts. At the moment,
 only FMS is supported, but email and several other will follow soon.</p>
+<p>If you do an insert via commandline notify can be suppressed with '--nonotify'</p>
 <p>
 First, put a <i>notify=&lt;group&gt;</i> in your <i>.hg/hgrc</i>, then add a special config section for this group.<br>
 
