@@ -87,9 +87,12 @@ class FCPIOConnection(object):
         buf = []
         while True:
             c = self.socket.recv(1)
-            if c == '\n':
-                break
-            buf.append(c)
+            if c:
+                if c == '\n':
+                    break
+                buf.append(c)
+            else:
+                raise Exception("FCP socket closed by node")
         ln = "".join(buf)
         return ln
 
@@ -1089,7 +1092,10 @@ def updatestatic_hook(ui, repo, hooktype, node=None, source=None, **kwargs):
 
             if msg.isMessageName('FinishedCompression'):
                 continue
-            
+
+            if msg.isMessageName('URIGenerated'):
+                continue
+
             if msg.isMessageName('PutFetchable'):
                 continue
 
