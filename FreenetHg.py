@@ -5,6 +5,44 @@
 # and/or modify it under the terms of the Do What The Fuck You Want
 # To Public License, Version 2, as published by Sam Hocevar. See
 # http://sam.zoy.org/wtfpl/COPYING for more details. */
+'''utilities for serving hg repositories and bundles over freenet
+
+The FreenetHg extension adds an FCP url handler to access repositories
+with fcp://127.0.0.1:9481//freenetkey, allows to insert repositories to freenet,
+put/get bundles direct to freenet and send notifies on commit/bundle 
+upload to FMS.
+
+To load the FreenetHg.py extension, add it to your .hgrc file (you have
+to use your global $HOME/.hgrc file, not one in a repository):
+
+    [extensions]
+    freenethg=/path/to/FreenetHg.py
+
+FCP uri scheme
+    fcp://<user>:<password>@<host>:<port>/<freenetkey>;<connectionparams>?<commandparams>
+
+The fcp uri scheme looks like the http uri scheme. Username and password
+are defined for future use, but currently ignored. If the host or port is
+not given, the value from hgrc or environment is taken. If none is found,
+it defaults to 127.0.0.1:9481
+
+connection parameters. (have only effect if a new connections is created) 
+    FCPLog 
+        if the parameter is set, any value turns logging on (default: off)
+    NoVersion
+        if the parameter is set, any value turns the fcp version check 
+        off (default: on)
+    Timeout
+        set timeout to the amount of seconds (default: 300)
+
+command parameters 
+    Priority
+        the priority class for the request (0...6) (default: 1)
+    MaxRetries
+        set the max retry count. -1 retries forever (default: 5)
+
+For further documentation visit freenet:USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/30/
+'''
 
 import os
 import time
@@ -30,6 +68,12 @@ from mercurial import localrepo
 from mercurial import manifest
 from mercurial import repo, util
 from mercurial.node import bin
+from mercurial import version
+
+NEW_API_VERSION = '1.1'
+hg_version = version.get_version()
+if hg_version >= NEW_API_VERSION:
+    from mercurial import store
 
 #
 # fcp rape begin
@@ -411,7 +455,7 @@ class fcprangereader(object):
             if msg.isMessageName('GetFailed'):
                 if (msg.getIntValue('Code')==27):
                     self._uri = msg.getValue('RedirectURI')
-                    return self.read(bytes)
+                    return self._getData()
                 raise Exception("GetFailed(%d) - %s: %s" % (msg.getIntValue('Code'), msg.getValue('ShortCodeDescription'), msg.getValue('CodeDescription')))
         
             if msg.isMessageName('SimpleProgress'):
@@ -430,6 +474,12 @@ def build_opener(ui, fcpcache, fcpconnection, commandparams, auth):
         return o
 
     return opener
+
+def joiner(a,*p):
+        ret = a
+        for i in p:
+            ret += "/"+i
+            return ret
 
 class fcprepository(localrepo.localrepository):
     def __init__(self, ui, freeneturi, fcpconnecton, commandparams, auth):
@@ -467,15 +517,18 @@ class fcprepository(localrepo.localrepository):
                 raise repo.RepoError(_("requirement '%s' not supported") % r)
 
         # setup store
-        if "store" in requirements:
-            self.encodefn = util.encodefilename
-            self.decodefn = util.decodefilename
-            self.spath = self.path + "/store"
+        if hg_version < NEW_API_VERSION:
+            if "store" in requirements:
+                self.encodefn = util.encodefilename
+                self.decodefn = util.decodefilename
+                self.spath = self.path + "/store"
+            else:
+                self.encodefn = lambda x: x
+                self.decodefn = lambda x: x
+                self.spath = self.path
+            self.sopener = util.encodedopener(opener(self.spath), self.encodefn)
         else:
-            self.encodefn = lambda x: x
-            self.decodefn = lambda x: x
-            self.spath = self.path
-        self.sopener = util.encodedopener(opener(self.spath), self.encodefn)
+            self.sopener = store.store(requirements, self.path, opener, joiner).opener
 
         self.manifest = manifest.manifest(self.sopener)
         self.changelog = changelog.changelog(self.sopener)
@@ -492,7 +545,6 @@ class fcprepository(localrepo.localrepository):
 
     def lock(self, wait=True):
         raise util.Abort(_('cannot lock fcp repository'))
-
 
 def instance(ui, fcp_url, create):
     if create:
@@ -873,7 +925,7 @@ class _static_composer(object):
         virtname = dir + filename
         realname = self._rootdir + virtname
 
-        f = open(realname)
+        f = open(realname, mode='rb')
         content = f.read()
         f.close()
 
@@ -957,7 +1009,7 @@ def fcp_bundle(ui, repo, **opts):
                                           'time' : now}})
         bundle_history.close()
 
-    if not kwargs.get('nonotify'):
+    if not opts.get('nonotify'):
         notify_data = {'uri' : resulturi,
                        'type' : 'bundle',
                        'repository' : '%s' % repo.root.split('/')[ - 1],
@@ -1232,6 +1284,8 @@ def fcp_setupwizz(ui, repo, **opts):
     def cfgget(cfg, section, item):
         try:
             return cfg.get(section, item)
+        except ConfigParser.NoSectionError:
+            return None
         except ConfigParser.NoOptionError:
             return None
 
@@ -1247,6 +1301,14 @@ def fcp_setupwizz(ui, repo, **opts):
             ui.warn('Config file already exist, comments will be lost on save! (^C to abort)\n')
             tmpcfg.read(hgrcpath) 
 
+        # check sections.
+        if not tmpcfg.has_section('ui'):
+            tmpcfg.add_section('ui')
+        if not tmpcfg.has_section('freenethg'):
+            tmpcfg.add_section('freenethg')
+        if not tmpcfg.has_section('hooks'):
+            tmpcfg.add_section('hooks')
+        
         # username
         username = cfgget(tmpcfg, 'freenethg', 'commitusername')
         if not username:
@@ -1294,7 +1356,7 @@ def fcp_setupwizz(ui, repo, **opts):
         # first try default or env settings
         testhost = os.environ.get("FCP_HOST", DEFAULT_FCP_HOST)
         testport = os.environ.get("FCP_PORT", DEFAULT_FCP_PORT)
-        testtimeout = os.environ.get("FCP_TIMEOUT", DEFAULT_TIMEOUT)
+        testtimeout = os.environ.get("FCP_TIMEOUT", DEFAULT_FCP_TIMEOUT)
         conn = None
         try:
             conn = FCPConnection(testhost, int(testport), testtimeout, None)
