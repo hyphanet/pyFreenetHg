@@ -87,7 +87,7 @@ REQUIRED_EXT_VERSION = 26
 
 DEFAULT_FCP_HOST = "127.0.0.1"
 DEFAULT_FCP_PORT = 9481
-DEFAULT_FCP_TIMEOUT = 300
+DEFAULT_FCP_TIMEOUT = 1800
 
 # utils
 def _getUniqueId():
@@ -113,6 +113,7 @@ class FCPIOConnection(object):
         self._logger = logger
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(timeout)
+        self.socket.setsockopt(socket.SOL_TCP, socket.TCP_NODELAY, 1)
         try:
             self.socket.connect((host, port))
         except Exception, e:
@@ -1519,7 +1520,7 @@ def fcp_setupwizz(ui, repo, **opts):
             fp.close()
             ui.write("New config succesfully written.\n")
         else:
-            ui.write("Nothing changed, config not written.\n")               
+            ui.write("Nothing changed, config not written.\n")
 
     finally:
         del lock

@@ -8,8 +8,8 @@
 <body style="margin: 1cm">
 <p>&nbsp;</p>
 <h1>Freenet &amp; mercurial</h1>
-<p><a href="/?newbookmark=USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/30/&amp;desc=Freenet and Mercurial" target="_blank">add to bookmarks: Freenet and Mercurial</a></p>
-<p><a href="/?newbookmark=USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/82/&amp;desc=Freenet and Mercurial (repository)" target="_blank">add to bookmarks: Freenet and Mercurial (repository)</a></p>
+<p><a href="/?newbookmark=USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg/31/&amp;desc=Freenet and Mercurial" target="_blank">add to bookmarks: Freenet and Mercurial</a></p>
+<p><a href="/?newbookmark=USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/83/&amp;desc=Freenet and Mercurial (repository)" target="_blank">add to bookmarks: Freenet and Mercurial (repository)</a></p>
 <p>&nbsp;</p>
 <h2><a name="toc">Table of Content</a></h2>
 <ul>
@@ -87,7 +87,7 @@ commit hooks:
 
 <h3><a name="requirements">Requirements</a></h3>
 <p>
-python &gt;= 2.4<br>
+python &gt;= 2.5<br>
 mercurial &gt;= 1.1.2+<br>
 last not least: a running freenet node ;)<br>
 knowledge about hg native commands <em>bundle/unbundle</em><br>
@@ -95,10 +95,11 @@ optional: <a href="/USK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8
 </p>
 <h3><a name="download">Download</a></h3>
 <p><a href="FreenetHg.py" target="_blank">download latest testverion from here</a></p>
+<p><a href="/SSK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg-31/FreenetHg.py" target="_blank">download version 0.2.1 from here</a></p>
 <p><a href="/SSK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg-30/FreenetHg.py" target="_blank">download version 0.2 from here</a></p>
 <p><a href="/SSK@MYLAnId-ZEyXhDGGbYOa1gOtkZZrFNTXjFl1dibLj9E,Xpu27DoAKKc8b0718E-ZteFrGqCYROe7XBBJI57pB4M,AQACAAE/pyFreenetHg-20/FreenetHg.py" target="_blank">download version 0.1.1 from here</a></p>
 <p>or get the working repository here:<br>
-hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/82/&nbsp;/tmp/your/local/path</p>
+hg&nbsp;clone|pull&nbsp;static-http://127.0.0.1:8888/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/83/&nbsp;/tmp/your/local/path</p>
 
 <h3><a name="installation">Installation</a></h3>
 <p><strong><em>Important hint:</em></strong> Do not store url encoded keys into hgrc (USK%40MY). Python does not like '%' here!</p>
@@ -124,7 +125,7 @@ If fcp settings are neither configured in hgrc nor environment variables are set
 <ul>
 <li>fcp host: 127.0.0.1</li>
 <li>fcp port: 9481</li>
-<li>fcp timeout: 5 minutes</li>
+<li>fcp timeout: 30 minutes</li>
 </ul>
 <h4><a name="conf_environment">Environment variables</a></h4>
 The following environment variables are supported:
@@ -197,7 +198,7 @@ uploadkeyword = triggerword
 <dl>
 <dt>--fcphost hostnameorip</dt><dd>specify fcphost if not 127.0.0.1</dd>
 <dt>--fcpport portnumber</dt><dd>specify fcpport if not 9481</dd>
-<dt>--fcptimeout seconds</dt><dd>specify fcp timeout if not 5 minutes</dd>
+<dt>--fcptimeout seconds</dt><dd>specify fcp timeout if not 30 minutes</dd>
 <dt>--fcplog</dt><dd>log fcp to mercurials output</dd>
 <dt>--fcpnoversion</dt><dd>omit fcp version check</dd>
 </dl>
@@ -272,7 +273,7 @@ If the host or port is not given, the value from hgrc or environment is taken. I
 <dl>
 <dt>FCPLog</dt><dd>if the parameter is set, any value turns logging on (<em>default: off</em>)</dd>
 <dt>NoVersion</dt><dd>if the parameter is set, any value turns the fcp version check off (<em>default: on</em>)</dd>
-<dt>Timeout</dt><dd>set timeout to the amount of seconds (<em>default: 300</em>)</dd>
+<dt>Timeout</dt><dd>set timeout to the amount of seconds (<em>default: 1800</em>)</dd>
 </dl>
 </li>
 <li>command parameters
@@ -287,8 +288,8 @@ Sample uris:
 fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/
 fcp:///USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/
 fcp:USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/ 
-fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/;FCPLog=true&TimeOut=300?Priority=1&MaxRetries=5                                               
-fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/?Priority=0&MaxRetries=-1                                               
+fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/;FCPLog=true&TimeOut=300?Priority=1&MaxRetries=5
+fcp://127.0.0.1:9481/USK@fQGiK~CfI8zO4cuNyhPRLqYZ5TyGUme8lMiRnS9TCaU,E3S1MLoeeeEM45fDLdVV~n8PCr9pt6GMq0tuH4dRP7c,AQACAAE/freenethg/54/?Priority=0&MaxRetries=-1
 </pre>
 
 </li>
