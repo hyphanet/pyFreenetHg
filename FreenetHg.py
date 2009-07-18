@@ -68,10 +68,10 @@ from mercurial import localrepo
 from mercurial import manifest
 from mercurial import repo, util
 from mercurial.node import bin
-from mercurial import version
+from mercurial.util import version
 
 NEW_API_VERSION = '1.1'
-hg_version = version.get_version()
+hg_version = version()
 if hg_version >= NEW_API_VERSION:
     from mercurial import store
 
